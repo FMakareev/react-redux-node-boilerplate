@@ -1,15 +1,16 @@
 global.Promise         = require('bluebird');
 
-var webpack            = require('webpack');
-var path               = require('path');
-var ExtractTextPlugin  = require('extract-text-webpack-plugin');
-var CleanWebpackPlugin = require('clean-webpack-plugin');
+const webpack                   = require('webpack');
+const path                      = require('path');
+const ExtractTextPlugin         = require('extract-text-webpack-plugin');
+const CleanWebpackPlugin        = require('clean-webpack-plugin');
+const ComponentDirectoryPlugin  = require('component-directory-webpack-plugin');
 
-var publicPath         = 'http://localhost:8050/public/assets';
-var cssName            = process.env.NODE_ENV === 'production' ? 'styles-[hash].css' : 'styles.css';
-var jsName             = process.env.NODE_ENV === 'production' ? 'bundle-[hash].js' : 'bundle.js';
+const publicPath                = 'http://localhost:8050/public/assets';
+const cssName                   = process.env.NODE_ENV === 'production' ? 'styles-[hash].css' : 'styles.css';
+const jsName                    = process.env.NODE_ENV === 'production' ? 'bundle-[hash].js' : 'bundle.js';
 
-var plugins = [
+const plugins = [
     new webpack.DefinePlugin({
         'process.env': {
             BROWSER:  JSON.stringify(true),
@@ -33,11 +34,10 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = {
     entry: ['babel-polyfill', './src/client.js'],
-    debug: process.env.NODE_ENV !== 'production',
+    // debug: process.env.NODE_ENV !== 'production',
     resolve: {
-        root:               path.join(__dirname, 'src'),
-        modulesDirectories: ['node_modules'],
-        extensions:         ['', '.js', '.jsx']
+        plugins: [new ComponentDirectoryPlugin()],
+        extensions: ['.js', '.jsx']
     },
     plugins,
     output: {
@@ -60,7 +60,7 @@ module.exports = {
             { test: /\.png$/, loader: 'url-loader?limit=10000&mimetype=image/png' },
             { test: /\.svg/, loader: 'url-loader?limit=26000&mimetype=image/svg+xml' },
             { test: /\.(woff|woff2|ttf|eot)/, loader: 'url-loader?limit=1' },
-            { test: /\.jsx?$/, loader: 'babel', exclude: [/node_modules/, /public/] },
+            { test: /\.jsx?$/, loader: 'babel-loader', exclude: [/node_modules/, /public/] },
             { test: /\.json$/, loader: 'json-loader' },
         ]
     },
